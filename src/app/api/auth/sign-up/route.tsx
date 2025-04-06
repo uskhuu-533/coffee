@@ -1,4 +1,4 @@
-// app/api/auth/sign-up/route.ts
+
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
 import bcrypt from 'bcryptjs';
@@ -19,8 +19,6 @@ export async function POST(req: NextRequest) {
     const validatedData = signUpSchema.parse(body);
     
     const { email, password, username, about } = validatedData;
-    
-    // Check if user already exists
     const existingUser = await prisma.user.findFirst({
       where: {
         OR: [
@@ -40,11 +38,8 @@ export async function POST(req: NextRequest) {
         { status: 409 }
       );
     }
-
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-    
-    // Create new user with profile
+
     const user = await prisma.user.create({
       data: {
         email,
@@ -58,7 +53,6 @@ export async function POST(req: NextRequest) {
             socialMediaURL : '',
             backgroundImage : '',
             successMessage : ""
-            // avatarImage is optional in your schema, so we don't need to set it
           }
         }
       },
@@ -66,8 +60,6 @@ export async function POST(req: NextRequest) {
         profile: true
       }
     });
-
-    // Return success response
     return NextResponse.json(
       {
         message: 'User created successfully',
